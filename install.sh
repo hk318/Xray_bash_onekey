@@ -34,7 +34,7 @@ OK="${Green}[OK]${Font}"
 Error="${RedW}[错误]${Font}"
 Warning="${RedW}[警告]${Font}"
 
-shell_version="1.9.2.0"
+shell_version="1.9.2.1"
 shell_mode="未安装"
 tls_mode="None"
 ws_grpc_mode="None"
@@ -778,7 +778,7 @@ xray_update() {
         if [[ ${auto_update} != "YES" ]]; then
             echo -e "${Warning} ${GreenBG} 检测到存在最新测试版 ${Font}"
             echo -e "${Warning} ${GreenBG} 脚本可能未兼容此版本 ${Font}"
-            echo -e "\n${Warning} ${GreenBG} 是否更新到测试版 [Y/${Red}N${Font}${YellowBG}]? ${Font}"
+            echo -e "\n${Warning} ${GreenBG} 是否更新到测试版 [Y/${Red}N${Font}${GreenBG}]? ${Font}"
             read -r xray_test_fq
         else
             xray_test_fq=1
@@ -797,7 +797,7 @@ xray_update() {
             systemctl stop xray
             wait
             bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -f --version v${xray_version}
-            udge "Xray 升级"
+            judge "Xray 升级"
             ;;
         esac
     else
@@ -1203,7 +1203,8 @@ port_exist_check() {
 
 acme() {
     #暂时解决ca问题
-    if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone --server letsencrypt -k ec-256 --force --test; then
+    # if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone --server letsencrypt -k ec-256 --force --test; then
+    if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone -k ec-256 --force --test; then
         echo -e "${OK} ${GreenBG} SSL 证书测试签发成功, 开始正式签发 ${Font}"
         rm -rf "$HOME/.acme.sh/${domain}_ecc"
     else
@@ -1212,7 +1213,8 @@ acme() {
         exit 1
     fi
 
-    if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone --server letsencrypt -k ec-256 --force; then
+    # if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone --server letsencrypt -k ec-256 --force; then
+    if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone -k ec-256 --force; then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
         mkdir -p ${ssl_chainpath}
         if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath ${ssl_chainpath}/xray.crt --keypath ${ssl_chainpath}/xray.key --ecc --force; then
